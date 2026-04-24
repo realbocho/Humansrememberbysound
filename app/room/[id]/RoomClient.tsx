@@ -2,7 +2,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import type { Room, Record } from '@/lib/types'
+import type { Room, Record as DiaryRecord } from '@/lib/types'
 import styles from './room.module.css'
 
 const LABEL_COLORS = ['#C94B3A','#2E6B4A','#1E3A5F','#7A4E2D','#5B2D8E','#8B6914']
@@ -23,7 +23,7 @@ type Screen = 'gallery' | 'record' | 'player'
 interface Props {
   user: { id: string; email?: string }
   room: Room
-  initialRecords: Record[]
+  initialRecords: DiaryRecord[]
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -32,7 +32,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
   const router = useRouter()
 
   const [screen, setScreen] = useState<Screen>('gallery')
-  const [records, setRecords] = useState<Record[]>(initialRecords)
+  const [records, setRecords] = useState<DiaryRecord[]>(initialRecords)
   const [signedRecords, setSignedRecords] = useState<Map<string, { audio: string; photo?: string }>>(new Map())
   const [toast, setToast] = useState<{ msg: string; type?: 'error' } | null>(null)
   const toastRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -58,7 +58,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
   const waveRAFRef = useRef<number | null>(null)
 
   // Player screen state
-  const [playerRecord, setPlayerRecord] = useState<Record | null>(null)
+  const [playerRecord, setPlayerRecord] = useState<DiaryRecord | null>(null)
   const [playerIdx, setPlayerIdx] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -326,7 +326,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
   }
 
   // ── PLAYER ─────────────────────────────────────────────────
-  function openPlayer(record: Record, idx: number) {
+  function openPlayer(record: DiaryRecord, idx: number) {
     if (playerAudioRef.current) { playerAudioRef.current.pause(); playerAudioRef.current = null }
     if (playerRAFRef.current) cancelAnimationFrame(playerRAFRef.current)
     setPlayerRecord(record)
@@ -408,7 +408,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
     if (!acc[key]) acc[key] = { label, items: [] }
     acc[key].items.push({ r, idx: i })
     return acc
-  }, {} as Record<string, { label: string; items: { r: Record<string, any>; idx: number }[] }>)
+  }, {} as globalThis.Record<string, { label: string; items: { r: DiaryRecord; idx: number }[] }>)
 
   const months = Object.keys(byMonth).sort().reverse()
   const now = new Date()
@@ -556,9 +556,9 @@ function ShelfCrate({
   signedRecords,
   onOpen,
 }: {
-  items: { r: Record; idx: number }[]
+  items: { r: DiaryRecord; idx: number }[]
   signedRecords: Map<string, { audio: string; photo?: string }>
-  onOpen: (item: { r: Record; idx: number }) => void
+  onOpen: (item: { r: DiaryRecord; idx: number }) => void
 }) {
   const crateRef = useRef<HTMLDivElement>(null)
   let isDown = false, startX = 0, scrollLeft = 0
@@ -626,7 +626,7 @@ function PlayerView({
   record, idx, urls, playing, progress, currentTime,
   onBack, onTogglePlay, onSeek, onDelete,
 }: {
-  record: Record
+  record: DiaryRecord
   idx: number
   urls?: { audio: string; photo?: string }
   playing: boolean
