@@ -92,7 +92,7 @@ export default function GalleryClient({ user, initialRooms }: Props) {
       <header className={styles.header}>
         <div className={styles.brand}>
           <div className={styles.eyebrow}>Sound Diary</div>
-          <div className={styles.wordmark}>소리로 기록해드릴~게~요~!!</div>
+          <div className={styles.wordmark}>Humans remember by sound</div>
         </div>
         <div className={styles.headerRight}>
           <span className={styles.userEmail}>{user.email}</span>
