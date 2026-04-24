@@ -461,7 +461,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
       </div>
 
       {/* ══════ RECORD SCREEN ══════ */}
-      <div className={`${styles.screen} ${styles.darkScreen} ${screen === 'record' ? styles.screenActive : ''}`}>
+      <div className={`${styles.screen} ${styles.darkScreen} ${screen === 'record' ? `${styles.screenActive} ${styles.darkScreenActive}` : ''}`}>
         <div className={styles.recHeader}>
           <div className={styles.recHeaderTitle}>새 LP 녹음</div>
           <button className={styles.closeBtn} onClick={() => { stopRecording(); setScreen('gallery') }}>✕</button>
@@ -526,7 +526,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
       </div>
 
       {/* ══════ PLAYER SCREEN ══════ */}
-      <div className={`${styles.screen} ${styles.darkScreen} ${screen === 'player' ? styles.screenActive : ''}`}>
+      <div className={`${styles.screen} ${styles.darkScreen} ${screen === 'player' ? `${styles.screenActive} ${styles.darkScreenActive}` : ''}`}>
         {playerRecord && (
           <PlayerView
             record={playerRecord}
