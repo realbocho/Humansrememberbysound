@@ -15,8 +15,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* ══════════════════════════════════
@@ -258,6 +259,17 @@
   align-items: center;
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
+.recordBody {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.recordBodyDone {
+  justify-content: flex-start;
+}
 .recHeaderTitle {
   font-family: 'Instrument Serif', serif;
   font-style: italic;
@@ -279,7 +291,7 @@
 .closeBtn:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
 
 .micArea {
-  flex: 1;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -351,13 +363,32 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  margin-top: auto;
 }
-.autoInfoRow { display: flex; gap: 20px; }
+.recInfoBarReady {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.05) 100%);
+}
+.autoInfoRow {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
 .autoChip { display: flex; align-items: center; gap: 6px; font-size: 10px; color: rgba(255,255,255,0.55); letter-spacing: 0.06em; }
 
-.recFormRow { display: flex; gap: 10px; align-items: center; }
+.recEditIntro {
+  font-size: 11px;
+  color: rgba(255,255,255,0.78);
+  letter-spacing: 0.06em;
+}
+
+.recFormRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 .titleInput {
   flex: 1;
+  min-width: 0;
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 3px;
@@ -385,6 +416,7 @@
   user-select: none;
 }
 .photoBtn:hover { border-color: var(--accent); }
+.photoInput { display: none; }
 
 .photoPreview { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
 .photoPreview img { width: 44px; height: 44px; object-fit: cover; border-radius: 3px; border: 1px solid var(--accent); display: block; }
@@ -525,8 +557,8 @@
   transform-origin: 72px 16px;
   transition: transform 0.8s cubic-bezier(0.4,0,0.2,1);
 }
-.tonearmParked { transform: rotate(0deg); }
-.tonearmPlaying { transform: rotate(-22deg); }
+.tonearmParked { transform: rotate(18deg); }
+.tonearmPlaying { transform: rotate(-8deg); }
 
 /* Progress */
 .progressArea { width: 100%; }
@@ -573,10 +605,106 @@
 
 @media (max-width: 640px) {
   .galleryHeader { padding: 18px 20px; }
+  .galleryBrand {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .galleryActions {
+    flex-shrink: 0;
+    gap: 10px;
+  }
   .shelves { padding: 28px 20px 40px; }
   .recHeader, .recInfoBar { padding-left: 20px; padding-right: 20px; }
+  .recordBody {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .micArea {
+    padding: 28px 20px 24px;
+    gap: 20px;
+    justify-content: flex-start;
+  }
+  .timeDisplay { font-size: 44px; }
+  .timeMax { margin-top: -14px; }
+  .waveform {
+    width: min(100%, 280px);
+    height: 56px;
+    gap: 2px;
+  }
+  .micBtn {
+    width: 76px;
+    height: 76px;
+    font-size: 24px;
+  }
+  .micPulse {
+    width: 88px;
+    height: 88px;
+  }
+  .recInfoBar {
+    padding-top: 18px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+  .recFormRow {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+  .titleInput {
+    width: 100%;
+    flex-basis: 100%;
+  }
+  .photoBtn,
+  .photoPreview {
+    width: 52px;
+    height: 52px;
+  }
+  .photoPreview img {
+    width: 52px;
+    height: 52px;
+  }
+  .saveBtn {
+    flex: 1;
+    min-height: 52px;
+  }
   .playerHeader { padding: 20px; }
+  .playerHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .playerMeta {
+    text-align: left;
+  }
   .turntableArea { padding: 16px 20px 28px; }
   .platterBase { width: 260px; height: 260px; }
   .vinylPlatter { width: 230px; height: 230px; }
+  .tonearm {
+    top: -4px;
+    right: -18px;
+    width: 72px;
+    height: 144px;
+    transform-origin: 64px 16px;
+  }
+  .playControls {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .galleryHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .galleryActions {
+    justify-content: space-between;
+  }
+  .platterBase {
+    width: min(100%, 236px);
+    height: min(100vw - 40px, 236px);
+  }
+  .vinylPlatter {
+    width: min(100%, 208px);
+    height: min(100%, 208px);
+  }
 }
