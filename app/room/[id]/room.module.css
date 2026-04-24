@@ -123,23 +123,23 @@
 /* ── SINGLE LP ── */
 .lpItem {
   flex-shrink: 0;
-  width: 144px;
+  width: 128px;
   position: relative;
   cursor: pointer;
   transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-  margin-right: -22px;
+  margin-right: -12px;
   transform-origin: bottom center;
 }
 .lpItem:hover {
-  transform: translateY(-30px) rotate(-1.5deg);
+  transform: translateY(-24px) rotate(-1.5deg);
   z-index: 20;
-  margin-right: 14px;
+  margin-right: 10px;
 }
 .lpItem:last-child { margin-right: 0; }
 
 .lpDisc {
-  width: 122px;
-  height: 122px;
+  width: 108px;
+  height: 108px;
   border-radius: 50%;
   margin: 0 auto;
   position: relative;
@@ -167,7 +167,7 @@
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: 42px; height: 42px;
+  width: 38px; height: 38px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -176,7 +176,7 @@
 }
 .labelDate {
   font-family: 'DM Mono', monospace;
-  font-size: 5.5px;
+  font-size: 5px;
   color: rgba(255,255,255,0.92);
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -185,8 +185,8 @@
 }
 
 .lpCover {
-  width: 122px; height: 122px;
-  margin: -10px auto 0;
+  width: 108px; height: 108px;
+  margin: -8px auto 0;
   border-radius: 2px;
   overflow: hidden;
   box-shadow: 2px 4px 12px rgba(0,0,0,0.2);
@@ -197,13 +197,13 @@
 .lpCoverEmoji {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 34px;
+  font-size: 30px;
 }
 
 .lpSpine {
   position: absolute;
   left: 0; bottom: 0;
-  width: 8px; height: 122px;
+  width: 8px; height: 108px;
   background: var(--warm-black);
   display: flex; align-items: center; justify-content: center;
   z-index: 2;
@@ -216,7 +216,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-height: 110px;
+  max-height: 96px;
 }
 
 .lpMeta { padding: 10px 0 0 4px; }
@@ -228,7 +228,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 130px;
+  max-width: 116px;
 }
 .lpMetaDate { font-size: 9px; color: var(--warm-gray); letter-spacing: 0.08em; margin-top: 2px; }
 .lpMetaLoc {
@@ -239,7 +239,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 130px;
+  max-width: 116px;
 }
 
 /* Empty state */
