@@ -408,7 +408,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
     if (!acc[key]) acc[key] = { label, items: [] }
     acc[key].items.push({ r, idx: i })
     return acc
-  }, {} as Record<string, { label: string; items: { r: Record; idx: number }[] }>)
+  }, {} as Record<string, { label: string; items: { r: Record<string, any>; idx: number }[] }>)
 
   const months = Object.keys(byMonth).sort().reverse()
   const now = new Date()
