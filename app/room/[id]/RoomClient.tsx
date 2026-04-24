@@ -156,6 +156,8 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
   async function toggleRecord() {
     if (isRecording) {
       stopRecording()
+    } else if (recDone) {
+      await saveRecord()
     } else if (!recDone) {
       await startRecording()
     }
@@ -483,7 +485,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
             </button>
           </div>
           <div className={styles.micHint}>
-            {recDone ? '녹음 완료! 저장하거나 다시 녹음하세요'
+            {recDone ? '녹음 완료! 가운데 버튼이나 아래 저장 버튼으로 저장하세요'
               : isRecording ? '탭하여 중지 (최대 15초)'
               : '탭하여 녹음 시작'}
           </div>
