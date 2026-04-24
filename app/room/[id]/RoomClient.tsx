@@ -17,6 +17,26 @@ function fmtTime(s: number) {
 function getLabelColor(i: number) { return LABEL_COLORS[i % LABEL_COLORS.length] }
 function getEmoji(i: number) { return EMOJIS[i % EMOJIS.length] }
 
+function getSupportedAudioMimeType() {
+  if (typeof window === 'undefined' || typeof MediaRecorder === 'undefined') return 'audio/webm'
+
+  const candidates = [
+    'audio/mp4;codecs=mp4a.40.2',
+    'audio/mp4',
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/ogg;codecs=opus',
+  ]
+
+  return candidates.find(type => MediaRecorder.isTypeSupported(type)) || 'audio/webm'
+}
+
+function getAudioExtension(mimeType: string) {
+  if (mimeType.includes('mp4')) return 'm4a'
+  if (mimeType.includes('ogg')) return 'ogg'
+  return 'webm'
+}
+
 // ─── types ────────────────────────────────────────────────────
 type Screen = 'gallery' | 'record' | 'player'
 
@@ -56,6 +76,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
   const audioCtxRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
   const waveRAFRef = useRef<number | null>(null)
+  const recordingMimeTypeRef = useRef('audio/webm')
 
   // Player screen state
   const [playerRecord, setPlayerRecord] = useState<DiaryRecord | null>(null)
@@ -76,6 +97,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
       streamRef.current?.getTracks().forEach(track => track.stop())
       if (audioCtxRef.current) audioCtxRef.current.close()
       playerAudioRef.current?.pause()
+      playerAudioRef.current = null
     }
   }, [recPhotoUrl])
 
@@ -187,11 +209,13 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
       const src = audioCtxRef.current.createMediaStreamSource(stream)
       src.connect(analyserRef.current)
 
-      const mr = new MediaRecorder(stream)
+      const mimeType = getSupportedAudioMimeType()
+      recordingMimeTypeRef.current = mimeType
+      const mr = new MediaRecorder(stream, { mimeType })
       audioChunksRef.current = []
       mr.ondataavailable = e => { if (e.data.size > 0) audioChunksRef.current.push(e.data) }
       mr.onstop = () => {
-        recordedBlobRef.current = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+        recordedBlobRef.current = new Blob(audioChunksRef.current, { type: recordingMimeTypeRef.current })
         setRecDone(true)
       }
       mr.start()
@@ -275,12 +299,14 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
     try {
       const uid = user.id
       const ts = Date.now()
-      const audioPath = `${uid}/${ts}_audio.webm`
+      const audioMimeType = recordedBlobRef.current.type || recordingMimeTypeRef.current || 'audio/webm'
+      const audioExt = getAudioExtension(audioMimeType)
+      const audioPath = `${uid}/${ts}_audio.${audioExt}`
 
       // Upload audio
       const { error: audioErr } = await supabase.storage
         .from('sound-diary')
-        .upload(audioPath, recordedBlobRef.current, { contentType: 'audio/webm' })
+        .upload(audioPath, recordedBlobRef.current, { contentType: audioMimeType })
 
       if (audioErr) {
         // Check for storage quota errors
@@ -367,7 +393,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
     setScreen('gallery')
   }
 
-  function togglePlay() {
+  async function togglePlay() {
     if (!playerRecord) return
     const urls = signedRecords.get(playerRecord.id)
     if (!urls?.audio) { showToast('오디오를 불러오는 중입니다…'); return }
@@ -379,16 +405,44 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
     } else {
       if (!playerAudioRef.current) {
         const audio = new Audio(urls.audio)
+        audio.preload = 'metadata'
+        audio.onerror = () => {
+          setPlaying(false)
+          showToast('이 브라우저에서 재생할 수 없는 오디오 형식입니다', 'error')
+        }
+        audio.onloadedmetadata = () => {
+          const dur = audio.duration || playerRecord.duration || 15
+          const cur = audio.currentTime || 0
+          setCurrentTime(cur)
+          setProgress(Math.min((cur / dur) * 100, 100))
+        }
+        audio.ontimeupdate = () => {
+          const dur = audio.duration || playerRecord.duration || 15
+          const cur = audio.currentTime
+          setCurrentTime(cur)
+          setProgress(Math.min((cur / dur) * 100, 100))
+        }
+        audio.onpause = () => {
+          setPlaying(false)
+          if (playerRAFRef.current) cancelAnimationFrame(playerRAFRef.current)
+        }
         audio.onended = () => {
           setPlaying(false)
           setProgress(100)
+          setCurrentTime(audio.duration || playerRecord.duration || 15)
           if (playerRAFRef.current) cancelAnimationFrame(playerRAFRef.current)
         }
         playerAudioRef.current = audio
       }
-      playerAudioRef.current.play()
-      setPlaying(true)
-      updateProgress()
+
+      try {
+        await playerAudioRef.current.play()
+        setPlaying(true)
+        updateProgress()
+      } catch {
+        setPlaying(false)
+        showToast('재생을 시작하지 못했습니다. 브라우저 호환성을 확인해주세요.', 'error')
+      }
     }
   }
 
