@@ -61,7 +61,7 @@ export default function AuthPage() {
         <div className={styles.form}>
           <div className={styles.brand}>
             <div className={styles.eyebrow}>Sound Diary</div>
-            <h1 className={styles.wordmark}>소리로 기록해드릴~게~요~!!</h1>
+            <h1 className={styles.wordmark}>Humans remember by sound</h1>
           </div>
 
           <div className={styles.tabs}>
