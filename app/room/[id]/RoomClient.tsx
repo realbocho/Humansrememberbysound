@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { Room, Record as DiaryRecord } from '@/lib/types'
@@ -66,6 +66,19 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
   const playerAudioRef = useRef<HTMLAudioElement | null>(null)
   const playerRAFRef = useRef<number | null>(null)
 
+  useEffect(() => {
+    return () => {
+      if (toastRef.current) clearTimeout(toastRef.current)
+      if (recTimerRef.current) clearInterval(recTimerRef.current)
+      if (waveRAFRef.current) cancelAnimationFrame(waveRAFRef.current)
+      if (playerRAFRef.current) cancelAnimationFrame(playerRAFRef.current)
+      if (recPhotoUrl) URL.revokeObjectURL(recPhotoUrl)
+      streamRef.current?.getTracks().forEach(track => track.stop())
+      if (audioCtxRef.current) audioCtxRef.current.close()
+      playerAudioRef.current?.pause()
+    }
+  }, [recPhotoUrl])
+
   function showToast(msg: string, type?: 'error') {
     setToast({ msg, type })
     if (toastRef.current) clearTimeout(toastRef.current)
@@ -98,6 +111,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
 
   // ── RECORD SCREEN ──────────────────────────────────────────
   function openRecord() {
+    if (recPhotoUrl) URL.revokeObjectURL(recPhotoUrl)
     setIsRecording(false)
     setRecSeconds(0)
     setRecDone(false)
@@ -242,9 +256,16 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    if (recPhotoUrl) URL.revokeObjectURL(recPhotoUrl)
     setRecPhotoFile(file)
     const url = URL.createObjectURL(file)
     setRecPhotoUrl(url)
+  }
+
+  function clearPhoto() {
+    if (recPhotoUrl) URL.revokeObjectURL(recPhotoUrl)
+    setRecPhotoFile(null)
+    setRecPhotoUrl(null)
   }
 
   async function saveRecord() {
@@ -469,6 +490,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
           <button className={styles.closeBtn} onClick={() => { stopRecording(); setScreen('gallery') }}>✕</button>
         </div>
 
+        <div className={`${styles.recordBody} ${recDone ? styles.recordBodyDone : ''}`}>
         <div className={styles.micArea}>
           <div className={styles.timeDisplay}>{fmtTime(recSeconds)}</div>
           <div className={styles.timeMax}>/ 0:15 max</div>
@@ -491,11 +513,16 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
           </div>
         </div>
 
-        <div className={styles.recInfoBar}>
+        <div className={`${styles.recInfoBar} ${recDone ? styles.recInfoBarReady : ''}`}>
           <div className={styles.autoInfoRow}>
             <div className={styles.autoChip}><span>📅</span><span>{autoDateStr}</span></div>
             <div className={styles.autoChip}><span>📍</span><span>{recLocation}</span></div>
           </div>
+          {recDone && (
+            <div className={styles.recEditIntro}>
+              제목과 사진을 추가한 뒤 저장하면 LP가 완성됩니다.
+            </div>
+          )}
           <div className={styles.recFormRow}>
             <input
               className={styles.titleInput}
@@ -509,12 +536,12 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
             {recPhotoUrl ? (
               <div className={styles.photoPreview}>
                 <img src={recPhotoUrl} alt="" />
-                <button className={styles.photoRemove} onClick={() => { setRecPhotoFile(null); setRecPhotoUrl(null) }}>✕</button>
+                <button className={styles.photoRemove} type="button" onClick={clearPhoto}>✕</button>
               </div>
             ) : (
               <label className={styles.photoBtn} htmlFor="photo-input">📷</label>
             )}
-            <input type="file" id="photo-input" accept="image/*" onChange={handlePhotoChange} />
+            <input className={styles.photoInput} type="file" id="photo-input" accept="image/*" onChange={handlePhotoChange} />
 
             <button
               className={styles.saveBtn}
@@ -524,6 +551,7 @@ export default function RoomClient({ user, room, initialRecords }: Props) {
               {saving ? '저장 중…' : '저장'}
             </button>
           </div>
+        </div>
         </div>
       </div>
 
