@@ -9,7 +9,7 @@
   background: var(--cream);
   z-index: 1;
 }
-.screen.active { display: block; }
+.screenActive { display: block; }
 .darkScreen { background: var(--warm-black); }
 
 /* ══════════════════════════════════
