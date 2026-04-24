@@ -56,16 +56,8 @@ export default function GalleryClient({ user, initialRooms }: Props) {
     setLoading(true)
     try {
       const { data: room, error } = await supabase
-        .from('rooms')
-        .select()
-        .eq('invite_code', inviteCode.trim().toUpperCase())
-        .single()
+        .rpc('join_room_by_invite', { invite: inviteCode.trim().toUpperCase() })
       if (error || !room) throw new Error('올바르지 않은 초대 코드입니다')
-
-      const { error: joinErr } = await supabase
-        .from('room_members')
-        .insert({ room_id: room.id, user_id: user.id })
-      if (joinErr && !joinErr.message.includes('duplicate')) throw joinErr
 
       if (!rooms.find(r => r.id === room.id)) {
         setRooms(prev => [...prev, room])
