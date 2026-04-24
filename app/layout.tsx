@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: '소리로 기록해드릴~게~요~!!',
+  title: 'Humans remember by sound!',
   description: '순간의 소리를 LP로 담는 사운드 다이어리',
 }
 
