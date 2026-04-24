@@ -39,11 +39,17 @@ export default function GalleryClient({ user, initialRooms }: Props) {
         .single()
       if (error) throw error
 
-      await supabase.from('room_members').insert({ room_id: room.id, user_id: user.id })
+      const { error: memberError } = await supabase
+        .from('room_members')
+        .insert({ room_id: room.id, user_id: user.id })
+      if (memberError) throw memberError
+
       setRooms(prev => [...prev, room])
       setModal(null)
       setRoomName('')
       showToast(`방이 생성되었습니다! 초대 코드: ${code}`)
+      router.push(`/room/${room.id}`)
+      router.refresh()
     } catch (e: any) {
       showToast(e.message || '오류가 발생했습니다', 'error')
     } finally {
@@ -65,6 +71,8 @@ export default function GalleryClient({ user, initialRooms }: Props) {
       setModal(null)
       setInviteCode('')
       showToast('방에 입장했습니다 🎵')
+      router.push(`/room/${room.id}`)
+      router.refresh()
     } catch (e: any) {
       showToast(e.message || '오류가 발생했습니다', 'error')
     } finally {
