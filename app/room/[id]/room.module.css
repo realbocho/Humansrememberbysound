@@ -557,8 +557,8 @@
   transform-origin: 72px 16px;
   transition: transform 0.8s cubic-bezier(0.4,0,0.2,1);
 }
-.tonearmParked { transform: rotate(18deg); }
-.tonearmPlaying { transform: rotate(-8deg); }
+.tonearmParked { transform: rotate(-8deg); }
+.tonearmPlaying { transform: rotate(18deg); }
 
 /* Progress */
 .progressArea { width: 100%; }
